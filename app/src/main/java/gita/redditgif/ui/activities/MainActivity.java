@@ -1,11 +1,17 @@
 package gita.redditgif.ui.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Point;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -42,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerItemClick
     private View gifFrame;
     private ProgressBar frameProgress;
     private ImageView fullScreenGifIV;
+    private Toolbar toolbar;
 
     private Point getScreenDimens() {
         WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
@@ -70,12 +77,27 @@ public class MainActivity extends AppCompatActivity implements RecyclerItemClick
         RedditApi redditApi = new RedditApi();
         redditApi.getGifJson(callback);
 
+        setSupportActionBar();
         recyclerView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
             @Override
             public void onScrollChanged() {
                 scrollImages();
             }
         });
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        startActivity(new Intent(this, DetailedActivity.class));
+        return false;
     }
 
     public void scrollImages() {
@@ -123,6 +145,11 @@ public class MainActivity extends AppCompatActivity implements RecyclerItemClick
         }
     };
 
+    protected void setSupportActionBar() {
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+    }
+
     @Override
     public void onItemClick(final Source source) {
         Animation animation = AnimationUtils.loadAnimation(this, R.anim.scale_out);
@@ -138,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerItemClick
                 ViewGroup.LayoutParams imageParams = fullScreenGifIV.getLayoutParams();
                 ViewGroup.LayoutParams frameParams = gifFrame.getLayoutParams();
 
-                float ratio = (float)screenWidthFrame / (float)source.getWidth();
+                float ratio = (float) screenWidthFrame / (float) source.getWidth();
 
                 imageParams.height = (int) (source.getHeight() * ratio);
                 imageParams.width = screenWidthFrame;
